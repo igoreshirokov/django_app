@@ -12,7 +12,7 @@ class Category(models.Model):
         return self.name
 
 class Product(models.Model):
-    name = models.CharField(max_length=150)
+    name = models.CharField(max_length=150, unique=True)
     status = models.CharField(choices=PRODUCT_STATUS, default=PRODUCT_STATUS["draft"], max_length=50)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
