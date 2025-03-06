@@ -1,16 +1,7 @@
-# import debugpy
-
-# # Ждем подключения отладчика
-# debugpy.listen(('0.0.0.0', 5678))
-# print("Ожидание подключения отладчика...")
-# debugpy.wait_for_client()  # Остановка выполнения до подключения отладчика
-
-# print("Отладчик подключен!")
-
 from django.core.management.base import BaseCommand, CommandError
 from products.models import Product, Category
 from orders.models import Order, OrderItem
-import time
+from datetime import datetime
 from tools.data import demo
 
 class Command(BaseCommand):
@@ -28,8 +19,20 @@ class Command(BaseCommand):
 
         for row in data:
             row['category'] = self.create_category(row['category'])
-            product, created = Product.objects.update_or_create(row)
             
+            try:
+                product = Product.objects.get(name=row['name'])
+                created = False
+            except:
+                product = Product()
+                created = True
+        
+            product.category = row['category']
+            product.status = row['status']
+            product.price = row['price']
+            product.name = row['name']
+            product.save()
+
             if created:
                 message = f'Товар "{product.name}" создан'
             else:
@@ -50,4 +53,29 @@ class Command(BaseCommand):
         return category
 
     def create_orders(self):
-        pass
+        data = demo.get_orders()
+        for row in data:
+            try:
+                self.create_order(row)
+            except Exception as e:
+                print(e)
+
+        
+    def create_order(self, row): 
+        product = Product.objects.get(
+            name=row['order_item']
+        )
+
+        order, created = Order.objects.get_or_create(
+            order_number=row['order_number'],
+            status=row['status'],
+            date=datetime.strptime(row['date'], '%d.%m.%Y'),
+        )
+
+        order_item, _ = OrderItem.objects.get_or_create(
+            product=product,
+            order=order,
+            quantity=row['quantity']
+        )
+
+        print(f'Добавлени {order_item} в кол-ве {order_item.quantity} к заказау №{order_item.order}')
