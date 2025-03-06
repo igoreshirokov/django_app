@@ -17,8 +17,8 @@
 Склонируйте репозиторий на ваш локальный компьютер:
 
 ```bash
-git clone https://github.com/igoreshirokov/
-cd 
+git clone https://github.com/igoreshirokov/django_app
+cd django_app
 ```
 
 2. Запустите Docker Compose
