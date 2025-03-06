@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models import Sum
+from datetime import datetime, timedelta
 
 PRODUCT_STATUS = {
     "publish": "Опубликован",
@@ -20,11 +22,30 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+    def totalQuantity(self):
+        return self.order_item.aggregate(total_quantity=Sum('quantity'))['total_quantity'] or 0
+
     def countOrdersLastMonth(self):
-        pass
+        """Количество quantity за предыдущий месяц"""
+        now = datetime.now()
+        first_day_of_previous_month = (now.replace(day=1) - timedelta(days=1)).replace(day=1)
+        last_day_of_previous_month = (now.replace(day=1) - timedelta(days=1))
+
+        return self.order_item.filter(
+            order__date__gte=first_day_of_previous_month,
+            order__date__lte=last_day_of_previous_month
+        ).aggregate(total_quantity=Sum('quantity'))['total_quantity'] or 0
 
     def countOrdersCurrentMonth(self):
-        pass
+        """Количество quantity за текущий месяц"""
+        now = datetime.now()
+        first_day_of_current_month = now.replace(day=1)
+        last_day_of_current_month = (now.replace(day=1) + timedelta(days=32)).replace(day=1) - timedelta(days=1)
+
+        return self.order_item.filter(
+            order__date__gte=first_day_of_current_month,
+            order__date__lte=last_day_of_current_month
+        ).aggregate(total_quantity=Sum('quantity'))['total_quantity'] or 0
 
 
 

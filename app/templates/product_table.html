@@ -1,0 +1,22 @@
+<table class="table">
+    <thead>
+      <tr>
+        {% for header in headers.items %}
+            <th class="col {{ header.0 }}">{{ header.1 }}</th>
+        {% endfor%}
+      </tr>
+    </thead>
+    <tbody>
+        {% for product in products %}
+        <tr>
+            <th scope="row">{{ product.id }}</th>
+            <td>{{ product.name }}</td>
+            <td>{{ product.category }}</td>
+            <td>{{ product.status }}</td>
+            <td>{{ product.price }}</td>
+            <td>{{ product.countOrdersLastMonth }}</td>
+            <td>{{ product.countOrdersCurrentMonth }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
