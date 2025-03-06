@@ -23,4 +23,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('', products_views.index),
+    path('logout/', products_views.logout),
 ]
