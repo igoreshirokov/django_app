@@ -24,4 +24,5 @@ urlpatterns = [
 
     path('', products_views.index),
     path('logout/', products_views.logout),
+    path('registration/', products_views.registration),
 ]

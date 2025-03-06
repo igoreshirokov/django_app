@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import Product
 from django.contrib.auth import authenticate as django_authenticate, get_user_model, login as django_login, logout as django_logout
+from django.core.validators import validate_email
 
 def index(request):
     if request.user.is_authenticated:
@@ -24,9 +25,6 @@ def table(request):
 
     return render(request,'index.html', context)
 
-def registration(request):
-    return render(request, 'registration.html')
-
 def login(request):
     message = ''
     if request.method == 'POST':
@@ -45,6 +43,57 @@ def login(request):
 def logout(request):
     django_logout(request)
     return redirect('/')
+
+
+def registration(request):
+    message = ''
+    if request.method == 'POST':
+        try:
+            user = user_registration(request)
+            if user is not None:
+                django_login(request, user)
+                return redirect('/')
+            else:
+                message = "Непредвиденная ошибка"
+        except Exception as e:
+            message = e
+    
+    return render(request, 'registration.html', {
+        'message': message
+    })
+
+def user_registration(request):
+    email = request.POST.get('email')
+    username = email.split('@')[0]
+    password = request.POST.get('password')
+    confirm_password = request.POST.get('confirm_password')
+
+    if password != confirm_password:
+        raise Exception('Пароли не совпадают')
+
+    try:
+        validate_email(email)
+    except:
+        raise Exception('Введите email адрес в формате example@domain.com')
+    
+    User = get_user_model()
+
+    user = None
+    try:
+        user = User.objects.get(email=email)
+    except:
+        pass
+
+    if user is not None:
+        raise Exception('Пользователь уже зарегистрирован. Пробуйте другой email адрес')
+
+    user = User()
+    user.username = username
+    user.email = email
+    user.set_password(password)
+    user.save()
+
+    return user
 
 def authenticate(request):
     try:
