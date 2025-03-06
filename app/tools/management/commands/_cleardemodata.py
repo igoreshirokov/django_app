@@ -11,6 +11,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.delete_products()
         self.delete_categories()
+        self.delete_orders()
 
     def delete_products(self):
         products = Product.objects.all()
@@ -26,3 +27,10 @@ class Command(BaseCommand):
             category.delete()
             print(f'Категория "{name}" удалена')
     
+
+    def delete_orders(self):
+        """Не реализовано"""
+        pass
+        orders = Order.objects.all()
+        for order in orders:
+            order.items.all()
