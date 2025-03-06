@@ -3,6 +3,7 @@ from datetime import datetime
 
 ORDER_STATUS = {
     'ожидание': 'В ожидании',
+    'выполнен': 'Выполнен',
 }
 
 class Order(models.Model):
